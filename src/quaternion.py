@@ -65,7 +65,9 @@ class Quaternion:
         m31 = 0
         m32 = 0
         m33 = 1
-        return Matrix(m00, m01, m02, m03,
-                      m10, m11, m12, m13,
-                      m20, m21, m22, m23,
-                      m30, m31, m32, m33)
+        return Matrix([
+            [m00, m01, m02, m03]
+            [m10, m11, m12, m13]
+            [m20, m21, m22, m23]
+            [m30, m31, m32, m33]
+            ])
