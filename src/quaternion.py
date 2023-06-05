@@ -3,18 +3,25 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 import math
+from .vector import Vector
 from .matrix import Matrix
 
 class Quaternion:
-    def __init__(self, parameter=None, axis=None, angle=None):
-        if parameter:
-            if len(parameter) != 4:
+    def __init__(self, parameters=None, axis=None, angle=None):
+        if parameters:
+            if len(parameters) != 4:
                 raise ValueError("Quaternion.__init__ takes a 4-element list")
-            self.x = parameter[0]
-            self.y = parameter[1]
-            self.z = parameter[2]
-            self.w = parameter[3]
+            if any(not isinstance(parameter, float) and not isinstance(parameter, int) for parameter in parameters):
+                raise ValueError("Quaternion.__init__ takes a 4-element list of float or int")
+            self.x = parameters[0]
+            self.y = parameters[1]
+            self.z = parameters[2]
+            self.w = parameters[3]
         elif axis and angle:
+            if not isinstance(axis, Vector):
+                raise ValueError("Quaternion.__init__ takes a Vector as axis")
+            if not isinstance(angle, float) or not isinstance(angle, int):
+                raise ValueError("Quaternion.__init__ takes a float or an int as angle")
             axis = axis.normalize()
             self.x = axis.x * math.sin(angle / 2)
             self.y = axis.y * math.sin(angle / 2)
@@ -62,4 +69,3 @@ class Quaternion:
                       m10, m11, m12, m13,
                       m20, m21, m22, m23,
                       m30, m31, m32, m33)
-
