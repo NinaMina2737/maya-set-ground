@@ -48,6 +48,9 @@ class Quaternion:
     def __abs__(self):
         return math.sqrt(self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w)
 
+    def inverse(self):
+        return Quaternion(-self.x, -self.y, -self.z, self.w)
+
     def to_rotate_matrix(self):
         m00 = 1 - 2 * self.y * self.y - 2 * self.z * self.z
         m01 = 2 * self.x * self.y - 2 * self.z * self.w
