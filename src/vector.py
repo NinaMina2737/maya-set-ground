@@ -6,14 +6,11 @@ import math
 
 class Vector:
     def __init__(self, *args):
-        if len(args) == 0:
-            self.data = [0, 0, 0]
-        elif len(args) == 1:
-            self.data = [args[0][i] for i in range(len(args[0]))]
-        elif len(args) == 3:
-            self.data = [args[i] for i in range(3)]
-        else:
-            raise ValueError("Vector.__init__ takes 0, 1, or 3 arguments")
+        if not all([isinstance(arg, (int, float)) for arg in args]):
+            raise ValueError("Vector.__init__ takes only integers or floats")
+        if not len(args) == 3:
+            raise ValueError("Vector.__init__ takes 3 arguments")
+        self.data = list(args)
 
     def __str__(self):
         return "Vector(%f, %f, %f)" % (self.data[0], self.data[1], self.data[2])
