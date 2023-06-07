@@ -50,9 +50,9 @@ class Vector3:
         return sum([self.data[i] * other.data[i] for i in range(3)])
 
     def cross(self, other):
-        return Vector3(self.data[1] * other.data[2] - self.data[2] * other.data[1],
+        return Vector3((self.data[1] * other.data[2] - self.data[2] * other.data[1],
                       self.data[2] * other.data[0] - self.data[0] * other.data[2],
-                      self.data[0] * other.data[1] - self.data[1] * other.data[0])
+                      self.data[0] * other.data[1] - self.data[1] * other.data[0]))
 
     def norm(self):
         return abs(self)
