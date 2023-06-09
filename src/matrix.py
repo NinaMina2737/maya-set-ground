@@ -6,7 +6,7 @@ import math
 from .vector import Vector
 
 class Matrix:
-    def __init__(self, rows=4, cols=4, data=None):
+    def __init__(self, rows=4, cols=4, data=None, translation=None, rotation=None, scale=None):
         if data is None:
             self.rows = rows
             self.cols = cols
@@ -35,9 +35,21 @@ class Matrix:
         return Matrix([[self.data[i][j] - other.data[i][j] for j in range(self.cols)] for i in range(self.rows)])
 
     def __mul__(self, other):
+        if not self.cols == other.rows:
+            raise ValueError("Matrix.__mul__ takes a matrix with the same number of rows as the number of columns of this matrix")
         if isinstance(other, Matrix):
             return Matrix([[sum([self.data[i][k] * other.data[k][j] for k in range(self.cols)]) for j in range(other.cols)] for i in range(self.rows)])
         elif isinstance(other, Vector):
             return Vector([sum([self.data[i][j] * other.data[j] for j in range(self.cols)]) for i in range(self.rows)])
         else:
             return Matrix([[self.data[i][j] * other for j in range(self.cols)] for i in range(self.rows)])
+
+    def __rmul__(self, other):
+        if not self.rows == other.cols:
+            raise ValueError("Matrix.__rmul__ takes a matrix with the same number of columns as the number of rows of this matrix")
+        if isinstance(other, Matrix):
+            return Matrix([[sum([other.data[i][k] * self.data[k][j] for k in range(self.cols)]) for j in range(other.cols)] for i in range(self.rows)])
+        elif isinstance(other, Vector):
+            return Vector([sum([other.data[j] * self.data[i][j] for j in range(self.cols)]) for i in range(self.rows)])
+        else:
+            return Matrix([[other * self.data[i][j] for j in range(self.cols)] for i in range(self.rows)])
