@@ -37,9 +37,9 @@ class Quaternion:
             if not all(character in "xyz" for character in rotate_order):
                 raise ValueError("Quaternion.__init__ takes a 3-character string as rotate_order")
             euler = euler / 2
-            quaternion_x = Quaternion(parameters=[math.cos(euler.x), math.sin(euler.x), 0, 0])
-            quaternion_y = Quaternion(parameters=[math.cos(euler.y), 0, math.sin(euler.y), 0])
-            quaternion_z = Quaternion(parameters=[math.cos(euler.z), 0, 0, math.sin(euler.z)])
+            quaternion_x = Quaternion(parameters=[math.sin(euler.x), 0, 0, math.cos(euler.x)])
+            quaternion_y = Quaternion(parameters=[0, math.sin(euler.y), 0, math.cos(euler.y)])
+            quaternion_z = Quaternion(parameters=[0, 0, math.sin(euler.z), math.cos(euler.z)])
             axis_map = {"x": quaternion_x, "y": quaternion_y, "z": quaternion_z}
             quaternion = axis_map[rotate_order[0]] * axis_map[rotate_order[1]] * axis_map[rotate_order[2]]
             self.x = quaternion.x
@@ -57,10 +57,11 @@ class Quaternion:
 
     def __mul__(self, other):
         if isinstance(other, Quaternion):
-            return Quaternion(self.w * other.x + self.x * other.w + self.y * other.z - self.z * other.y,
-                            self.w * other.y + self.y * other.w + self.z * other.x - self.x * other.z,
-                            self.w * other.z + self.z * other.w + self.x * other.y - self.y * other.x,
-                            self.w * other.w - self.x * other.x - self.y * other.y - self.z * other.z)
+            x = self.w * other.x + self.x * other.w + self.y * other.z - self.z * other.y
+            y = self.w * other.y + self.y * other.w + self.z * other.x - self.x * other.z
+            z = self.w * other.z + self.z * other.w + self.x * other.y - self.y * other.x
+            w = self.w * other.w - self.x * other.x - self.y * other.y - self.z * other.z
+            return Quaternion(parameters=[x, y, z, w])
         else:
             raise ValueError("Quaternion.__mul__ takes a Quaternion")
 
@@ -87,9 +88,10 @@ class Quaternion:
         m31 = 0
         m32 = 0
         m33 = 1
-        return Matrix([
-            [m00, m01, m02, m03]
-            [m10, m11, m12, m13]
-            [m20, m21, m22, m23]
+        data = [
+            [m00, m01, m02, m03],
+            [m10, m11, m12, m13],
+            [m20, m21, m22, m23],
             [m30, m31, m32, m33]
-            ])
+            ]
+        return Matrix(data=data)
