@@ -14,6 +14,9 @@ class Vector3:
         else:
             elements = [0, 0, 0]
         self.data = list(elements)
+        self.x = self.data[0]
+        self.y = self.data[1]
+        self.z = self.data[2]
 
     def __str__(self):
         return "Vector(%f, %f, %f)" % (self.data[0], self.data[1], self.data[2])
