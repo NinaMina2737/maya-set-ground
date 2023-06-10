@@ -34,7 +34,7 @@ class Vector3:
         return Vector3([self.data[i] - other.data[i] for i in range(3)])
 
     def __mul__(self, other):
-        if len(other) != 1:
+        if not isinstance(other, (int, float)):
             raise ValueError("Vector.__mul__ takes a scalar")
         return Vector3([self.data[i] * other for i in range(3)])
 
