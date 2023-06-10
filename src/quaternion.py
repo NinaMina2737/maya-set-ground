@@ -3,11 +3,11 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 import math
-from .vector import Vector
-from .matrix import Matrix
+from vector import Vector3
+from matrix import Matrix
 
 class Quaternion:
-    def __init__(self, parameters=None, axis=None, angle=None):
+    def __init__(self, parameters=None, axis=None, angle=None, euler=None, rotate_order="xyz"):
         if parameters:
             if len(parameters) != 4:
                 raise ValueError("Quaternion.__init__ takes a 4-element list")
@@ -18,7 +18,7 @@ class Quaternion:
             self.z = parameters[2]
             self.w = parameters[3]
         elif axis and angle:
-            if not isinstance(axis, Vector):
+            if not isinstance(axis, Vector3):
                 raise ValueError("Quaternion.__init__ takes a Vector as axis")
             if not isinstance(angle, float) or not isinstance(angle, int):
                 raise ValueError("Quaternion.__init__ takes a float or an int as angle")
@@ -27,6 +27,25 @@ class Quaternion:
             self.y = axis.y * math.sin(angle / 2)
             self.z = axis.z * math.sin(angle / 2)
             self.w = math.cos(angle / 2)
+        elif euler:
+            if not isinstance(euler, Vector3):
+                raise ValueError("Quaternion.__init__ takes a Vector as euler")
+            if not isinstance(rotate_order, str):
+                raise ValueError("Quaternion.__init__ takes a string as rotate_order")
+            if not len(rotate_order) == 3:
+                raise ValueError("Quaternion.__init__ takes a 3-character string as rotate_order")
+            if not all(character in "xyz" for character in rotate_order):
+                raise ValueError("Quaternion.__init__ takes a 3-character string as rotate_order")
+            euler = euler / 2
+            quaternion_x = Quaternion(parameters=[math.cos(euler.x), math.sin(euler.x), 0, 0])
+            quaternion_y = Quaternion(parameters=[math.cos(euler.y), 0, math.sin(euler.y), 0])
+            quaternion_z = Quaternion(parameters=[math.cos(euler.z), 0, 0, math.sin(euler.z)])
+            axis_map = {"x": quaternion_x, "y": quaternion_y, "z": quaternion_z}
+            quaternion = axis_map[rotate_order[0]] * axis_map[rotate_order[1]] * axis_map[rotate_order[2]]
+            self.x = quaternion.x
+            self.y = quaternion.y
+            self.z = quaternion.z
+            self.w = quaternion.w
         else:
             raise ValueError("Quaternion.__init__ takes a 4-element list or an axis and an angle")
 
