@@ -30,7 +30,7 @@ class Quaternion:
         elif euler:
             if not isinstance(euler, Vector3):
                 raise ValueError("Quaternion.__init__ takes a Vector as euler")
-            if not isinstance(rotate_order, str):
+            if not isinstance(rotate_order, (str, unicode)):
                 raise ValueError("Quaternion.__init__ takes a string as rotate_order")
             if not len(rotate_order) == 3:
                 raise ValueError("Quaternion.__init__ takes a 3-character string as rotate_order")
