@@ -5,6 +5,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import maya.cmds as cmds
 import math
 import traceback
+
 import vector
 reload(vector)
 from vector import Vector3
@@ -71,9 +72,7 @@ def get_normal():
         rotate_z = cmds.getAttr(face_object + ".rotateZ") / 180 * math.pi
         euler_angles = Vector3(elements=(rotate_x, rotate_y, rotate_z))
         rotate_matrix = matrix.euler_to_rotate_matrix(euler_angles)
-        print("rotate_matrix", rotate_matrix)
         face_normal = rotate_matrix * face_normal
-        print("face_normal", face_normal)
         normal = face_normal
         vertices = cmds.polyListComponentConversion(face, toVertex=True)
     # normalize the normal
@@ -101,35 +100,47 @@ def get_normal():
 
     # check if the normal is same direction as the average vector of the vertex normals
     dot_product = normal.dot(vertex_normal_average_vector)
-    print("before_normal", normal)
     if abs(dot_product) < DIFFERENCE_THRESHOLD:
         dot_product = 0
     if dot_product < 0:
         normal *= -1
-    print("after_normal", normal)
     return normal
 
 def set_ground(source_normal=None, target_normal=None):
-    source_normal = Vector3(elements=source_normal)
-    target_normal = Vector3(elements=target_normal)
-    source_normal = source_normal.normalize()
-    target_normal = target_normal.normalize()
-    print("source_normal", source_normal)
-    print("target_normal", target_normal)
+    if source_normal is None:
+        source_normal = get_normal()
+    if target_normal is None:
+        target_normal = Vector3(elements=(0.0, -1.0, 0.0))
+    source_normal = Vector3(elements=source_normal).normalize()
+    target_normal = Vector3(elements=target_normal).normalize()
     rotate_axis = source_normal.cross(target_normal).normalize()
-    print("rotate_axis", rotate_axis)
+
     dot_product = source_normal.dot(target_normal)
-    print("dot_product", dot_product)
     cosine_rotate_angle = dot_product / (source_normal.length() * target_normal.length())
-    print("cosine_rotate_angle", cosine_rotate_angle)
     rotate_angle = math.acos(cosine_rotate_angle)
-    print("rotate_angle", rotate_angle)
+
     rotate_quaternion = quaternion.axis_angle_to_rotate_quaternion(rotate_axis, rotate_angle)
-    print("rotate_quaternion", rotate_quaternion)
     rotate_matrix = rotate_quaternion.to_rotate_matrix4x4()
-    print("rotate_matrix", rotate_matrix)
+
     object_shape = cmds.ls(selection=True, objectsOnly=True)[0]
-    print("object_shape", object_shape)
     object = cmds.listRelatives(object_shape, parent=True)[0]
-    print("object", object)
     cmds.xform(object, relative=True, matrix=rotate_matrix.flatten())
+
+def execute(source_normal=None, target_normal=None):
+    try:
+        # Open an undo chunk
+        cmds.undoInfo(openChunk=True)
+        # Execute the script
+        set_ground(source_normal=source_normal, target_normal=target_normal)
+    except Exception as e:
+        # Print the error message
+        cmds.warning("An error occurred: {}".format(str(e)))
+        # Print the traceback
+        cmds.warning(traceback.format_exc())
+    finally:
+        # Close the undo chunk
+        cmds.undoInfo(closeChunk=True)
+
+if __name__ == '__main__':
+    # Execute the script
+    execute()
