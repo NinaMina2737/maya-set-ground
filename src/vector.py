@@ -13,49 +13,49 @@ class Vector3:
                 raise ValueError("Vector.__init__ takes 3 elements")
         else:
             elements = [0, 0, 0]
-        self.data = list(elements)
-        self.x = self.data[0]
-        self.y = self.data[1]
-        self.z = self.data[2]
+        self.elements = list(elements)
+        self.x = self.elements[0]
+        self.y = self.elements[1]
+        self.z = self.elements[2]
 
     def __str__(self):
-        return "Vector(%f, %f, %f)" % (self.data[0], self.data[1], self.data[2])
+        return "Vector(%f, %f, %f)" % (self.elements[0], self.elements[1], self.elements[2])
 
     def __iter__(self):
-        return iter(self.data)
+        return iter(self.elements)
 
     def __len__(self):
-        return len(self.data)
+        return len(self.elements)
 
     def __add__(self, other):
-        return Vector3([self.data[i] + other.data[i] for i in range(3)])
+        return Vector3([self.elements[i] + other.elements[i] for i in range(3)])
 
     def __sub__(self, other):
-        return Vector3([self.data[i] - other.data[i] for i in range(3)])
+        return Vector3([self.elements[i] - other.elements[i] for i in range(3)])
 
     def __mul__(self, other):
         if not isinstance(other, (int, float)):
             raise ValueError("Vector.__mul__ takes a scalar")
-        return Vector3([self.data[i] * other for i in range(3)])
+        return Vector3([self.elements[i] * other for i in range(3)])
 
     def __truediv__(self, other):
         if not isinstance(other, (int, float)):
             raise ValueError("Vector.__div__ takes a scalar")
-        return Vector3([self.data[i] / other for i in range(3)])
+        return Vector3([self.elements[i] / other for i in range(3)])
 
     def __abs__(self):
-        return math.sqrt(self.data[0] * self.data[0] + self.data[1] * self.data[1] + self.data[2] * self.data[2])
+        return math.sqrt(self.elements[0] * self.elements[0] + self.elements[1] * self.elements[1] + self.elements[2] * self.elements[2])
 
     def normalize(self):
         return self / abs(self)
 
     def dot(self, other):
-        return sum([self.data[i] * other.data[i] for i in range(3)])
+        return sum([self.elements[i] * other.elements[i] for i in range(3)])
 
     def cross(self, other):
-        return Vector3((self.data[1] * other.data[2] - self.data[2] * other.data[1],
-                      self.data[2] * other.data[0] - self.data[0] * other.data[2],
-                      self.data[0] * other.data[1] - self.data[1] * other.data[0]))
+        return Vector3((self.elements[1] * other.elements[2] - self.elements[2] * other.elements[1],
+                      self.elements[2] * other.elements[0] - self.elements[0] * other.elements[2],
+                      self.elements[0] * other.elements[1] - self.elements[1] * other.elements[0]))
 
     def norm(self):
         return abs(self)
