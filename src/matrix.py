@@ -5,6 +5,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import math
 from vector import Vector3
 
+DIFFERENCE_THRESHOLD = 1e-6
+
 class Matrix:
     def __init__(self, rows=None, cols=None, elements=None):
         if rows is None and cols is None and elements is None:
