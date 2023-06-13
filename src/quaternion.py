@@ -6,6 +6,8 @@ import math
 from vector import Vector3
 from matrix import Matrix
 
+DIFFERENCE_THRESHOLD = 1e-6
+
 class Quaternion:
     def __init__(self, parameters=None):
         if parameters:
