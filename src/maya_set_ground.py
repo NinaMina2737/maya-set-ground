@@ -71,7 +71,8 @@ def get_normal():
         rotate_y = cmds.getAttr(face_object + ".rotateY") / 180 * math.pi
         rotate_z = cmds.getAttr(face_object + ".rotateZ") / 180 * math.pi
         euler_angles = Vector3(elements=(rotate_x, rotate_y, rotate_z))
-        rotate_matrix = matrix.euler_to_rotate_matrix(euler_angles)
+        rotate_order = cmds.xform(face_object, query=True, rotateOrder=True)
+        rotate_matrix = matrix.euler_to_rotate_matrix(angles=euler_angles, rotate_order=rotate_order)
         face_normal = rotate_matrix * face_normal
         normal = face_normal
         vertices = cmds.polyListComponentConversion(face, toVertex=True)
@@ -106,7 +107,10 @@ def get_normal():
         normal *= -1
     return normal
 
-def set_ground(source_normal=None, target_normal=None):
+def set_ground(object=None, source_normal=None, target_normal=None):
+    if object is None:
+        object_shape = cmds.ls(selection=True, objectsOnly=True)[0]
+        object = cmds.listRelatives(object_shape, parent=True)[0]
     if source_normal is None:
         source_normal = get_normal()
     if target_normal is None:
@@ -122,16 +126,24 @@ def set_ground(source_normal=None, target_normal=None):
     rotate_quaternion = quaternion.axis_angle_to_rotate_quaternion(rotate_axis, rotate_angle)
     rotate_matrix = rotate_quaternion.to_rotate_matrix4x4()
 
-    object_shape = cmds.ls(selection=True, objectsOnly=True)[0]
-    object = cmds.listRelatives(object_shape, parent=True)[0]
+    current_pivot = cmds.xform(object, query=True, rotatePivot=True, worldSpace=True)
+    current_pivot_vector = Vector3(elements=current_pivot)
+
+    # move the object to the origin
+    cmds.xform(object, relative=True, translation=(-current_pivot_vector.x, -current_pivot_vector.y, -current_pivot_vector.z))
+
+    # rotate the object
     cmds.xform(object, relative=True, matrix=rotate_matrix.flatten())
 
-def execute(source_normal=None, target_normal=None):
+    # move the object back
+    cmds.xform(object, relative=True, translation=(current_pivot_vector.x, current_pivot_vector.y, current_pivot_vector.z))
+
+def execute(object=None, source_normal=None, target_normal=None):
     try:
         # Open an undo chunk
         cmds.undoInfo(openChunk=True)
         # Execute the script
-        set_ground(source_normal=source_normal, target_normal=target_normal)
+        set_ground(object=object, source_normal=source_normal, target_normal=target_normal)
     except Exception as e:
         # Print the error message
         cmds.warning("An error occurred: {}".format(str(e)))
