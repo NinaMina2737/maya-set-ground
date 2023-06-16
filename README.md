@@ -17,6 +17,12 @@
 ## Usage
 
 1. Run `setGround` from your shelf.
+2. Select one face or three vertices as source.
+3. Click `Select Source`.
+4. Select one face or three vertices as target.
+5. Click `Select Target`.
+6. Click `Execute` to rotate.
+7. (Optional) Check `Invert Target Vector` to invert target vector.
 
 ## License
 
